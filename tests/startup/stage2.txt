@@ -1,0 +1,8 @@
+# Стартовый скрипт этапа 2: команды выполняются по очереди,
+# ошибочные строки пропускаются.
+ls -l /home
+cd docs
+unknown_command arg
+exit too many args
+ls
+exit

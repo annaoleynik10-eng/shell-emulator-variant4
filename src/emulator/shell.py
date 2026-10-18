@@ -48,6 +48,28 @@ class Shell:
             self.output(result)
         return True
 
+    def run_script(self, path):
+        """Выполнить стартовый скрипт построчно.
+
+        Каждая команда выводится вместе с приглашением, как будто её
+        ввёл пользователь. Пустые строки и комментарии (#) пропускаются,
+        строки с ошибками тоже пропускаются - выполнение продолжается.
+        Возвращает число строк, завершившихся ошибкой.
+        """
+        try:
+            with open(path, encoding="utf-8") as file:
+                lines = file.read().splitlines()
+        except OSError as error:
+            raise ShellError(f"cannot read script: {path}") from error
+        failed = 0
+        for line in lines:
+            if not line.strip() or line.lstrip().startswith("#"):
+                continue
+            self.output(self.prompt() + line)
+            if not self.execute(line):
+                failed += 1
+        return failed
+
     def run_interactive(self, read=input):
         """Запустить диалог с пользователем и вернуть код завершения."""
         while True:
