@@ -42,7 +42,11 @@ class Shell:
         Возвращает True при успехе и False при ошибке.
         Исключение ShellExit пробрасывается наружу.
         """
-        parsed = parse_line(line)
+        try:
+            parsed = parse_line(line)
+        except ShellError as error:
+            self.output(f"shell: {error}")
+            return False
         if parsed is None:
             return True
         name, args = parsed

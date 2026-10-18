@@ -42,11 +42,11 @@ class ScriptTest(unittest.TestCase):
         """Ошибочные строки пропускаются, выполнение продолжается."""
         lines = []
         shell = Shell(output=lines.append)
-        path = write_script("# comment\n\nfoo\nls a\n")
+        path = write_script("# comment\n\nfoo\nexit 1 2\nls\n")
         self.addCleanup(os.remove, path)
-        self.assertEqual(shell.run_script(path), 1)
+        self.assertEqual(shell.run_script(path), 2)
         self.assertIn("foo: command not found", lines)
-        self.assertEqual(lines[-1], "ls: args=['a']")
+        self.assertEqual(lines[-1], f"{shell.prompt()}ls")
         self.assertTrue(lines[0].endswith("$ foo"))
 
     def test_exit_stops_script(self):

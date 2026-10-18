@@ -1,0 +1,51 @@
+# Этап 4: ls, cd, uniq, find, rev (запускать с VFS deep).
+# --- ls: все режимы
+ls
+ls -l
+ls etc var
+ls -l etc/passwd
+ls -x
+ls nowhere
+# --- cd: относительные и абсолютные пути, .., ~
+cd home/anya
+ls
+cd docs
+cd ..
+cd ./projects/emulator
+ls -l
+cd ../../../..
+cd /var/log
+cd
+cd etc/passwd
+cd nowhere
+cd a b
+# --- uniq: все режимы
+uniq var/log/system.log
+uniq -c var/log/system.log
+uniq -d var/log/system.log
+uniq -cd home/anya/docs/todo.txt
+uniq
+uniq etc
+uniq -z etc/passwd
+# --- rev
+rev etc/hostname
+rev etc/passwd home/anya/docs/lecture.txt
+rev bin/data.bin
+rev
+rev nowhere
+# --- find: все режимы
+find
+find home
+find / -name "*.txt"
+find / -type d
+find . -type f -name "*.md"
+find -name passwd
+find nowhere
+find / -size 1
+find / -name
+find / -type x
+find / -name "*.txt
+# --- служебные команды и прошлые этапы
+vfs-info
+unknown_command
+exit
