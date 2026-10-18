@@ -1,0 +1,29 @@
+# Этап 5: chown и help (запускать с VFS deep).
+# --- help: все режимы
+help
+help chown
+help ls exit
+help nope
+# --- chown: изменения только в памяти
+ls -l etc
+chown student etc/passwd
+ls -l etc
+chown -R guest home
+ls -l home
+ls -l home/anya/docs
+cd home/anya
+chown anya docs/todo.txt ../../motd
+ls -l docs
+cd
+ls -l
+# --- chown: ошибки
+chown
+chown student
+chown Bad!Name etc/passwd
+chown student nowhere
+chown -x student etc
+# --- остальные команды на изменённой VFS
+find / -type f -name "*.txt"
+uniq -c var/log/system.log
+rev etc/hostname
+exit

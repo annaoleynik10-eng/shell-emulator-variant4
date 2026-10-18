@@ -6,6 +6,7 @@
 
 import fnmatch
 import itertools
+import re
 
 from emulator.errors import ShellError, ShellExit
 from emulator.vfs import CURRENT_DIR, SEPARATOR
@@ -20,6 +21,8 @@ FIND_TYPES = {"f": False, "d": True}
 DIR_MODE = "drwxr-xr-x"
 FILE_MODE = "-rw-r--r--"
 COUNT_WIDTH = 7
+CHOWN_MIN_ARGS = 2
+USER_NAME = re.compile(r"[a-z_][a-z0-9_-]*")
 
 
 def lookup(shell, path):
@@ -175,6 +178,35 @@ def cmd_find(shell, args):
         if find_matches(item, display, options))
 
 
+def cmd_chown(shell, args):
+    """Сменить владельца: chown [-R] владелец путь [путь ...]."""
+    flags, rest = split_flags(args, {"-R"})
+    if len(rest) < CHOWN_MIN_ARGS:
+        raise ShellError("missing operand")
+    owner, paths = rest[0], rest[1:]
+    if not USER_NAME.fullmatch(owner):
+        raise ShellError(f"invalid user: '{owner}'")
+    nodes = [lookup(shell, path)[1] for path in paths]
+    for node in nodes:
+        targets = walk(node, "") if "-R" in flags else [("", node)]
+        for _, item in targets:
+            item.owner = owner
+    return ""
+
+
+def cmd_help(shell, args):
+    """Показать список команд с описанием: help [команда ...]."""
+    del shell
+    names = args or sorted(COMMANDS)
+    lines = []
+    for name in names:
+        if name not in COMMANDS:
+            raise ShellError(f"no help topics match '{name}'")
+        summary = COMMANDS[name].__doc__.splitlines()[0]
+        lines.append(f"{name:<9} {summary}")
+    return "\n".join(lines)
+
+
 def cmd_exit(shell, args):
     """Завершить работу эмулятора: exit [код]."""
     del shell
@@ -204,6 +236,8 @@ COMMANDS = {
     "uniq": cmd_uniq,
     "find": cmd_find,
     "rev": cmd_rev,
+    "chown": cmd_chown,
+    "help": cmd_help,
     "exit": cmd_exit,
     "vfs-info": cmd_vfs_info,
 }
