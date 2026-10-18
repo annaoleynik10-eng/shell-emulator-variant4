@@ -6,20 +6,31 @@ import socket
 from emulator import commands
 from emulator.errors import ShellError, ShellExit
 from emulator.parser import parse_line
+from emulator.vfs import ROOT_SYMBOL, SEPARATOR, VFS
+
+MOTD_NAME = "motd"
 
 
 class Shell:
     """Эмулятор командной оболочки UNIX-подобной ОС."""
 
-    def __init__(self, output=print):
+    def __init__(self, output=print, vfs=None):
         """Подготовить оболочку, взяв имя пользователя и хоста из ОС."""
         self.user = getpass.getuser()
         self.host = socket.gethostname().split(".")[0]
         self.output = output
+        self.vfs = vfs if vfs is not None else VFS(self.user)
+        self.cwd = []
 
     def cwd_display(self):
-        """Вернуть текущий каталог в виде для приглашения."""
-        return "~"
+        """Вернуть текущий каталог в виде для приглашения (~ - корень)."""
+        return SEPARATOR.join([ROOT_SYMBOL] + self.cwd)
+
+    def show_motd(self):
+        """Вывести сообщение дня из файла motd в корне VFS, если он есть."""
+        node = self.vfs.root.children.get(MOTD_NAME)
+        if node is not None and not node.is_dir:
+            self.output(node.text().rstrip("\n"))
 
     def prompt(self):
         """Сформировать приглашение вида user@host:~$."""

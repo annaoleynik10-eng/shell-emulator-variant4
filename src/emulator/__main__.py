@@ -5,6 +5,15 @@ import sys
 from emulator.config import debug_lines, parse_args
 from emulator.errors import ShellError, ShellExit
 from emulator.shell import Shell
+from emulator.vfs import VFS
+
+
+def make_shell(vfs_path):
+    """Создать оболочку и подключить VFS, если указан путь к ней."""
+    shell = Shell()
+    if vfs_path:
+        shell.vfs = VFS.from_zip(vfs_path, shell.user)
+    return shell
 
 
 def main(argv=None):
@@ -12,7 +21,12 @@ def main(argv=None):
     options = parse_args(argv)
     for line in debug_lines(options):
         print(line)
-    shell = Shell()
+    try:
+        shell = make_shell(options.vfs)
+    except ShellError as error:
+        print(f"emulator: {error}", file=sys.stderr)
+        return 1
+    shell.show_motd()
     if options.script:
         try:
             shell.run_script(options.script)

@@ -35,8 +35,18 @@ def cmd_exit(shell, args):
     raise ShellExit(code)
 
 
+def cmd_vfs_info(shell, args):
+    """Служебная команда: показать источник и размер VFS."""
+    if args:
+        raise ShellError("too many arguments")
+    dirs, files = shell.vfs.count()
+    source = shell.vfs.source or "(empty VFS)"
+    return f"source: {source}\ndirectories: {dirs}\nfiles: {files}"
+
+
 COMMANDS = {
     "ls": cmd_ls,
     "cd": cmd_cd,
     "exit": cmd_exit,
+    "vfs-info": cmd_vfs_info,
 }

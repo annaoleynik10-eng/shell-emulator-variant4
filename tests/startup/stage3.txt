@@ -1,0 +1,8 @@
+# Этап 3: проверка подключения VFS и команд прошлых этапов.
+vfs-info
+vfs-info extra
+ls -l
+cd home
+unknown_command
+exit 1 2
+exit
